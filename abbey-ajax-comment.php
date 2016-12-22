@@ -93,9 +93,9 @@ class Abbey_Ajax_Comment{
 	
 	function abbey_comment_hidden_fields( $field, $args ){
 		$field .= '<div class="comment-form-verification form-group">
-										<input id="verification" name="abbey-ajax-comment-verification" type="hidden" 
+						<input id="verification" name="abbey-ajax-comment-verification" type="hidden" 
 											value="false"/>
-									</div>';
+					</div>';
 		return $field;
 	}
 

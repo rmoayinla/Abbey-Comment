@@ -52,7 +52,7 @@ class Abbey_Comment_Rating{
 
 		$this->add_rating_count( $rating_type, $rating );
 
-		print_r( get_comment_meta( $this->comment_ID, $this->comment_count_key[$rating_type], true ) );
+		print_r( $rating );
 
 		wp_die();
 	}
