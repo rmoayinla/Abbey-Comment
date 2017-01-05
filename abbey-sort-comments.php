@@ -18,29 +18,29 @@ class Abbey_Sort_Comments{
 			 ) 
 		);
 
-		$this->create_sort_menus();
-
 		add_filter( "query_vars", array( $this, "comment_sort_vars" ) );
 
 		add_action('pre_get_comments', array( $this, 'sort_comments' ) ); 
 
-		
+		$this->create_sort_menus();
 	}
 
 	function display_menu(){	?>
 		<ul class="nav nav-pills">
-			<?php if( count( $this->sort_menus ) > 0 ) {
-				$html = "";
-				foreach( $this->sort_menus as $sort_by => $menu ){
-					$html .= sprintf('<li><a href="%1$s" title="%2$s"> <span class="fa fa-fw %4$s"> </span> %3$s </a></li>', 
-						$this->query_vars_url( $menu["url"] ), 
-						sprintf( __( "Sort comments by %s", "abbey-ajax-comment" ), $sort_by ), 
-						esc_html( ucwords( $sort_by ) ), 
-						esc_attr( $menu["icon"] )
-						);
+			<?php 
+				if( count( $this->sort_menus ) > 0 ) {
+					$html = "";
+					foreach( $this->sort_menus as $sort_by => $menu ){
+						$html .= sprintf('<li><a href="%1$s" title="%2$s"> <span class="fa fa-fw %4$s"> </span> %3$s </a></li>', 
+											$this->query_vars_url( $menu["url"] ), 
+											sprintf( __( "Sort comments by %s", "abbey-ajax-comment" ), $sort_by ), 
+											esc_html( ucwords( $sort_by ) ), 
+											esc_attr( $menu["icon"] )
+										);
+					}
 				}
-			}
-			echo $html;		?>
+				echo $html;		
+			?>
 		</ul>			<?php 
 	}
 
@@ -57,10 +57,19 @@ class Abbey_Sort_Comments{
 		$defaults = array(
 			$this->sort_keys["orderby"] => "", 
 			$this->sort_keys["meta_query"] => "", 
-			$this->sort_keys["meta_key"] => "", 
-			$this->sort_keys["order"] => ( get_query_var( "abbey_c_order" ) === "ASC" ) ? "DESC" : "ASC"
-			); 
+			$this->sort_keys["meta_key"] => "",
+			$this->sort_keys["order"] => "",
+			);
+
+		 
 		$key = array_merge( $defaults, $key );
+
+		if( empty( get_query_var( $this->sort_keys["order"] ) ) ){
+			$key[ $this->sort_keys["order"] ] = ( get_option( "comment_order" ) === "asc" ) ? "DESC" : "ASC";
+		}
+		else {
+			$key[ $this->sort_keys["order"] ] = ( get_query_var( $this->sort_keys["order"] ) === "ASC" ) ? "DESC" : "ASC";
+		}
 
 		$key = array_filter( $key, function ( $value ){ return !empty( $value ); } );
 
@@ -68,7 +77,8 @@ class Abbey_Sort_Comments{
 	}
 
 	function create_sort_menus(){
-		$this->sort_menus[ "date" ] = array( "icon" => "fa-clock-o", "url" => array() ); 
+		$order_value = "";
+		$this->sort_menus[ "date" ] = array( "icon" => "fa-clock-o", "url" => array( ) ); 
 		$this->sort_menus[ "upvote" ] = array( "icon" => "fa-thumbs-o-up", 
 			"url" => [ "abbey_c_meta_key" => "abbey_comment_rating_upvote_count", "abbey_c_orderby" => "meta_value" ] 
 			);
@@ -76,6 +86,7 @@ class Abbey_Sort_Comments{
 
 	function sort_comments( $query ){
 		$args = array();
+
 		if( count( $this->sort_keys ) > 0 ){
 			foreach( $this->sort_keys as $key => $sort ){
 				if( !empty( get_query_var( $sort ) ) )
