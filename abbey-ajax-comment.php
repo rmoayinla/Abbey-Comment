@@ -1,14 +1,15 @@
 <?php
-/*
-* Plugin Name: Abbey Ajax Comment
-* Description: Submit comment through Ajax 
-* Author: Rabiu Mustapha
-* Version: 0.1
-* Text Domain: abbey-ajax-comment
-
+/**
+ * Plugin Name: Abbey Ajax Comment
+ * Description: Submit comment through Ajax 
+ * Author: Rabiu Mustapha
+ * Version: 0.1
+ * Text Domain: abbey-ajax-comment
 */
 class Abbey_Ajax_Comment{
+
 	public function __construct(){
+
 		add_action ( "wp_enqueue_scripts", array ( $this, "enque_js" ) );
 
 		add_filter( 'comment_form_submit_field', array( $this, 'abbey_comment_hidden_fields' ), 10, 2 );
@@ -17,6 +18,7 @@ class Abbey_Ajax_Comment{
 
 		add_action ( "wp_ajax_abbey_ajax_comment", array ( $this, "process_comment" ) );
 	}
+
 	function enque_js(){
 		wp_enqueue_script( "abbey-ajax-comment-script", plugin_dir_url( __FILE__ )."/abbey-ajax-comment.js", array( "jquery" ), 1.0, true );
 		wp_localize_script( "abbey-ajax-comment-script", "abbeyAjaxComment", 
@@ -51,8 +53,8 @@ class Abbey_Ajax_Comment{
 					);
 				} else {
 					echo sprintf( '<div class="alert alert-success"><strong>%1$s<strong> %2$s </div>', 
-									__( "Success:", "abbey-ajax-comment" ), 
-									__( "Your comment has been posted and is awaiting moderation. Thanks", "abbey-ajax-comment" )
+									esc_html__( "Success:", "abbey-ajax-comment" ), 
+									esc_html__( "Your comment has been posted and is awaiting moderation. Thanks", "abbey-ajax-comment" )
 								);
 				}
 			}
@@ -93,13 +95,14 @@ class Abbey_Ajax_Comment{
 	
 	function abbey_comment_hidden_fields( $field, $args ){
 		$field .= '<div class="comment-form-verification form-group">
-						<input id="verification" name="abbey-ajax-comment-verification" type="hidden" 
-											value="false"/>
+						<input id="verification" name="abbey-ajax-comment-verification" 
+						 	type="hidden" value="false"/>
 					</div>';
 		return $field;
 	}
 
 }
+
 require plugin_dir_path(__FILE__)."abbey-comment-rating.php";
 require plugin_dir_path(__FILE__)."abbey-sort-comments.php";
 
